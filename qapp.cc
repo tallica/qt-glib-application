@@ -2,7 +2,7 @@
 #include <QtGui>
 #include <QApplication>
 #include <QMainWindow>
-#include <QtConcurrent/QtConcurrent>
+#include "thread.h"
 
 using namespace std;
 
@@ -16,15 +16,24 @@ extern "C" {
     }
 }
 
-int main(int argc, char * * argv) {
+void Thread::run() {
+    qDebug() << "Thread start";
+    GMainLoop *main_loop = g_main_loop_new(NULL, FALSE);
+    g_main_loop_run(main_loop);
+    qDebug() << "Thread end";
+}
+
+int main(int argc, char **argv) {
 
     g_timeout_add_seconds(1, (GSourceFunc) callback, NULL);
 
-    QCoreApplication app(argc, argv);
-    // QApplication app(argc, argv);
+    Thread *t = new Thread;
+    t->start();
 
-    // QMainWindow m;
-    // m.show();
+    QApplication app(argc, argv);
+
+    QMainWindow m;
+    m.show();
 
     return app.exec();
 }
