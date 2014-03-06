@@ -1,7 +1,7 @@
 TEMPLATE = app
-SOURCES = qapp.cc
+SOURCES = qapp.cc glib_thread.cc
 
-HEADERS = thread.h
+HEADERS = glib_thread.h
 
 CONFIG += qt link_pkgconfig
 CONFIG -= app_bundle

@@ -2,7 +2,9 @@
 #include <QtGui>
 #include <QApplication>
 #include <QMainWindow>
-#include "thread.h"
+#include <QPushButton>
+#include <QHBoxLayout>
+#include "glib_thread.h"
 
 using namespace std;
 
@@ -10,30 +12,31 @@ extern "C" {
     #include <glib.h>
     #include <stdio.h>
 
-    int callback() {
-        qDebug() << "callback";
-        return 1;
+    gboolean callback() {
+        qDebug() << "Timer callback:" << QThread::currentThread();
+        return TRUE;
     }
-}
-
-void Thread::run() {
-    qDebug() << "Thread start";
-    GMainLoop *main_loop = g_main_loop_new(NULL, FALSE);
-    g_main_loop_run(main_loop);
-    qDebug() << "Thread end";
 }
 
 int main(int argc, char **argv) {
 
     g_timeout_add_seconds(1, (GSourceFunc) callback, NULL);
 
-    Thread *t = new Thread;
-    t->start();
+    GlibThread *loop = new GlibThread;
+    loop->start();
 
     QApplication app(argc, argv);
 
-    QMainWindow m;
-    m.show();
+    QWidget *window = new QWidget;
+    QPushButton *button = new QPushButton("Click clik!");
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->addWidget(button);
+    window->setLayout(layout);
+    window->show();
+
+    qDebug() << "Qt GUI:" << QThread::currentThread();
+
+    QObject::connect(button, SIGNAL(clicked()), loop, SLOT(clicked()));
 
     return app.exec();
 }
